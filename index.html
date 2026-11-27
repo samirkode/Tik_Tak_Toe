@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tik Tak Toe</title>
+    <style>
+        * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    background-color: #5e616064;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh; /* full screen center */
+    flex-direction: column;
+    font-family: Arial, sans-serif;
+}
+
+h1 {
+    margin-bottom: 20px;
+    color: #fff;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+select{
+    margin-bottom: 10px;
+
+}
+
+.box {
+    display: grid;
+    grid-template-columns: repeat(3, 150px);
+    grid-template-rows: repeat(3, 150px);
+    gap: 5px;
+    width: 500px;
+    height: 450px;
+}
+
+.btn {
+    background-color: #e9a798;
+    border: 2px solid #000000;
+    border-radius: 10px;
+    font-size: 2rem;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    color: #6c9a8b;
+    font-size: 4em;
+}
+
+.btn:hover {
+    background-color: #e0b7ac;
+}
+
+.restart {
+    margin-top: 20px;
+    padding: 10px 20px;
+    background-color: #333;
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 1rem;
+}
+
+.restart:hover {
+    background-color: #555;
+}
+
+    </style>
+</head>
+<body>
+
+
+    <main>
+          <h1>Tik Tak Toe </h1>
+            <select class="mode">
+  <option value="pvp">Player vs Player</option>
+  <option value="pvc">Player vs Computer</option>
+</select>
+            <div class="box">
+                <button class="btn"></button>
+                <button class="btn"></button>
+                <button class="btn"></button>
+                <button class="btn"></button>
+                <button class="btn"></button>
+                <button class="btn"></button>
+                <button class="btn"></button>
+                <button class="btn"></button>
+                <button class="btn"></button>
+            </div>
+            <button class="restart">Restart</button>
+            <button class="new">New</button>
+    </main>
+    <script>let btns = document.querySelectorAll(".btn");
+let restart = document.querySelector(".restart");
+let modeSelect = document.querySelector(".mode"); // dropdown or buttons for mode
+
+let turnO = true;
+let gameMode = "pvp"; // default mode: player vs player
+
+const winPatterns = [
+    [0, 1, 2],
+    [0, 3, 6],
+    [0, 4, 8],
+    [1, 4, 7],
+    [2, 5, 8],
+    [2, 4, 6],
+    [3, 4, 5],
+    [6, 7, 8]
+];
+
+// Function to check winner
+function checkWinner() {
+    for (let pattern of winPatterns) {
+        let [a, b, c] = pattern;
+        if (
+            btns[a].innerText !== "" &&
+            btns[a].innerText === btns[b].innerText &&
+            btns[b].innerText === btns[c].innerText
+        ) {
+            alert(`Winner is ${btns[a].innerText}!`);
+            disableAllButtons();
+            return true;
+        }
+    }
+    return false;
+}
+
+// Disable all buttons after win
+function disableAllButtons() {
+    btns.forEach((btn) => btn.disabled = true);
+}
+
+// Reset game
+restart.addEventListener("click", () => {
+    btns.forEach((btn) => {
+        btn.innerText = "";
+        btn.disabled = false;
+    });
+    turnO = true;
+});
+
+// Computer move (random empty cell)
+function computerMove() {
+    let emptyCells = [];
+    btns.forEach((btn, index) => {
+        if (btn.innerText === "") emptyCells.push(index);
+    });
+
+    if (emptyCells.length > 0) {
+        let randomIndex = emptyCells[Math.floor(Math.random() * emptyCells.length)];
+        btns[randomIndex].innerText = "X"; // computer always plays X
+        btns[randomIndex].disabled = true;
+        checkWinner();
+        turnO = true; // back to player O
+    }
+}
+
+// Mode selection (dropdown or buttons)
+if (modeSelect) {
+    modeSelect.addEventListener("change", (e) => {
+        gameMode = e.target.value; // "pvp" or "pvc"
+        restart.click(); // reset game when mode changes
+    });
+}
+
+// Player clicks
+btns.forEach((btn) => {
+    btn.addEventListener("click", () => {
+        if (turnO) {
+            btn.innerText = "O";
+            turnO = false;
+        } else {
+            btn.innerText = "X";
+            turnO = true;
+        }
+        btn.disabled = true;
+
+        let won = checkWinner();
+
+        // If mode is PvC and it's computer's turn
+        if (!won && gameMode === "pvc" && !turnO) {
+            setTimeout(computerMove, 500); // small delay for realism
+        }
+    });
+});
+</script>
+</body>
+</html>
